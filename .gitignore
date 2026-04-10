@@ -1,0 +1,16 @@
+esp32/.pio
+esp32/.vscode/.browse.c_cpp.db*
+esp32/.vscode/c_cpp_properties.json
+esp32/.vscode/launch.json
+esp32/.vscode/ipch
+esp32/include/adafruit_key.h
+esp32cam/.pio
+esp32cam/.vscode/.browse.c_cpp.db*
+esp32cam/.vscode/c_cpp_properties.json
+esp32cam/.vscode/launch.json
+esp32cam/.vscode/ipch
+esp32camControl/.pio
+esp32camControl/.vscode/.browse.c_cpp.db*
+esp32camControl/.vscode/c_cpp_properties.json
+esp32camControl/.vscode/launch.json
+esp32camControl/.vscode/ipch
