@@ -4,6 +4,9 @@
 #include <Adafruit_NeoPixel.h>
 #include "global.h"
 
-void neo_blinky(void *pvParameters);
+
+void neo_setup();
+void neo_animation(void *pvParameters);
+void neo_blinky();
 
 #endif

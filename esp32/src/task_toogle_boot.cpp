@@ -17,9 +17,9 @@ void Task_Toogle_BOOT(void *pvParameters)
             {
                 Serial.println("Boot button pressed for 2 seconds. Restarting...");
                 component_reset();
-                digitalWrite(LED_GPIO, LOW);
+                digitalWrite(LED1_PIN, LOW);
                 vTaskDelay(pdMS_TO_TICKS(500));
-                digitalWrite(LED_GPIO, HIGH);
+                digitalWrite(LED1_PIN, HIGH);
                 vTaskDelay(pdMS_TO_TICKS(500));
                 vTaskDelete(NULL);
             }

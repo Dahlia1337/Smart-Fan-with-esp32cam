@@ -23,7 +23,7 @@ bool cam_setup()
     config.pin_reset = RESET_GPIO_NUM;
     config.xclk_freq_hz = 20000000;
     // Ảnh màu
-    config.pixel_format = PIXFORMAT_JPEG; 
+    config.pixel_format = PIXFORMAT_JPEG;
 
     // Thiết lập độ phân giải và chất lượng
     if (psramFound())
@@ -54,26 +54,53 @@ void task_cam(void *pvParameters)
 {
     while (1)
     {
-        // Chụp một khung hình
-        camera_fb_t *fb = esp_camera_fb_get();
-
-        if (!fb)
+        // 1. Chỉ làm việc khi máy tính (PC) gửi lệnh xuống
+        if (Serial.available() > 0)
         {
-            //Serial.println("Error: Cannot take picture");
-            vTaskDelay(pdMS_TO_TICKS(1000));
-            continue;
+            String req = Serial.readStringUntil('\n');
+            req.trim();
+
+            // 2. Nếu PC hô "REQ_FRAME" (Yêu cầu ảnh mới)
+            if (req == "REQ_FRAME")
+            {
+                // Lúc này mới bắt đầu bấm máy chụp
+                camera_fb_t *fb = esp_camera_fb_get();
+
+                if (fb)
+                {
+                    // Đổi header từ "IMG:" thành "[PYTHON_IMG:]" cho khớp code Python
+                    Serial.printf("[PYTHON_IMG:%u]\n", fb->len);
+
+                    // Gửi cục data nhị phân
+                    Serial.write(fb->buf, fb->len);     
+
+                    // Trả lại bộ đệm
+                    esp_camera_fb_return(fb);
+                }
+                else
+                {
+                    // Báo lỗi cho PC nếu chụp xịt
+                    Serial.println("[PYTHON_IMG:0]");
+                }
+            }
+            // 3. Nếu PC gửi kết quả AI trả về (VD: "AI:2")
+            else if (req.startsWith("AI:"))
+            {
+                uint8_t ai_label = req.substring(3).toInt();
+
+                if (aiResultQueue != NULL)
+                {
+                    BaseType_t status = xQueueSend(aiResultQueue, &ai_label, 0);
+
+                    if (status != pdPASS)
+                    {
+                        // break
+                    }
+                }
+            }
         }
 
-        //Serial.printf("IMAGE_START: Size: %u bytes, Width: %d, Height: %d\n", fb->len, fb->width, fb->height);
-
-        // BƯỚC 1: GỬI HEADER BÁO HIỆU
-        Serial.printf("IMG:%u\n", fb->len);
-
-        // BƯỚC 2: GỬI TOÀN BỘ MẢNG BYTE ẢNH JPEG
-        Serial.write(fb->buf, fb->len);
-
-        esp_camera_fb_return(fb);
-
-        vTaskDelay(pdMS_TO_TICKS(100));
+        // Nghỉ 1ms để nhường CPU cho FreeRTOS (Không dùng delay 20ms nữa)
+        vTaskDelay(pdMS_TO_TICKS(1));
     }
 };

@@ -5,7 +5,6 @@
 //     pinMode(LED_GPIO, OUTPUT);
 
 //     while (1) {
-//         Serial.println("LED Blinky");
 //         digitalWrite(LED_GPIO, HIGH);
 //         vTaskDelay(pdMS_TO_TICKS(500));
 //         digitalWrite(LED_GPIO, LOW);
